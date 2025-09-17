@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>H$kass - Neon Interface</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #0a0a0a;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      color: #ff1a1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 50px;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 6rem;
+      text-shadow:
+        0 0 5px #ff1a1a,
+        0 0 10px #ff1a1a,
+        0 0 20px #ff0000,
+        0 0 40px #ff0000,
+        0 0 80px #ff0000;
+      margin-bottom: 10px;
+      letter-spacing: 0.3em;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      color: #ff4c4c;
+      text-shadow: 0 0 5px #ff4c4c;
+      margin-bottom: 40px;
+    }
+
+    .dragons {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      opacity: 0.15;
+      filter: drop-shadow(0 0 10px #ff1a1a);
+      z-index: 0;
+      user-select: none;
+    }
+
+    .dragons svg {
+      width: 100%;
+      height: 100%;
+      stroke: #ff1a1a;
+      stroke-width: 2;
+      fill: none;
+      filter:
+        drop-shadow(0 0 6px #ff0000)
+        drop-shadow(0 0 12px #ff3300);
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+
+    main {
+      position: relative;
+      z-index: 10;
+      width: 90%;
+      max-width: 480px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      padding: 24px;
+      box-shadow:
+        0 0 10px #ff1a1a,
+        inset 0 0 15px #ff3300;
+    }
+
+    label {
+      color: #ff6666;
+      font-weight: bold;
+      margin-top: 16px;
+      display: block;
+      text-shadow: 0 0 6px #ff3333;
+    }
+
+    input, button, textarea {
+      width: 100%;
+      background: #0a0a0a;
+      border: 2px solid #ff1a1a;
+      border-radius: 6px;
+      color: #ffcccc;
+      padding: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      text-shadow: 0 0 4px #ff1a1a;
+      margin-top: 6px;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #ff3300;
+      outline: none;
+      box-shadow: 0 0 10px #ff3300;
+      background: #1a0000;
+      color: #fff0f0;
+    }
+
+    button {
+      background: #ff1a1a;
+      font-weight: 900;
+      border: none;
+      cursor: pointer;
+      margin-top: 24px;
+      box-shadow:
+        0 0 8px #ff3300,
+        0 0 18px #ff3300;
+      text-shadow: 0 0 10px #ff0000;
+      user-select: none;
+    }
+
+    button:hover:not(:disabled) {
+      background: #ff3300;
+      box-shadow:
+        0 0 14px #ff4400,
+        0 0 30px #ff5500;
+    }
+
+    button:disabled {
+      background: #550000;
+      box-shadow: none;
+      cursor: not-allowed;
+      color: #660000;
+      text-shadow: none;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 120px;
+      margin-top: 12px;
+      background: #100000;
+      box-shadow: inset 0 0 12px #ff1a1a;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>H$kass</h1>
+  <div class="subtitle">Automatize suas tarefas educacionais</div>
+
+  <!-- Dragões estilizados em SVG -->
+  <div class="dragons" aria-hidden="true">
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" >
+      <path d="M32 2 C12 12, 12 52, 32 62 C52 52, 52 12, 32 2 Z" />
+      <path d="M20 40 C22 36, 26 34, 28 30" />
+      <path d="M44 40 C42 36, 38 34, 36 30" />
+      <circle cx="32" cy="24" r="3" />
+    </svg>
+  </div>
+
+  <main>
+    <!-- Aqui você pode colocar seu formulário / app -->
+    <label for="ra">RA:</label>
+    <input id="ra" type="text" placeholder="Digite seu RA" />
+
+    <label for="digito">Dígito:</label>
+    <input id="digito" type="text" placeholder="Digite o dígito" />
+
+    <label for="uf">UF:</label>
+    <input id="uf" type="text" placeholder="Digite a UF" />
+
+    <label for="senha">Senha:</label>
+    <input id="senha" type="password" placeholder="Digite sua senha" />
+
+    <label for="apikey">Chave API OpenAI:</label>
+    <input id="apikey" type="text" placeholder="Cole sua API Key aqui" />
+
+    <button id="sendBtn">Executar tarefa</button>
+
+    <label for="response">Resposta:</label>
+    <textarea id="response" readonly></textarea>
+  </main>
+
+  <script>
+    const sendBtn = document.getElementById('sendBtn');
+    const responseField = document.getElementById('response');
+
+    sendBtn.addEventListener('click', async () => {
+      const ra = document.getElementById('ra').value.trim();
+      const digito = document.getElementById('digito').value.trim();
+      const uf = document.getElementById('uf').value.trim();
+      const senha = document.getElementById('senha').value.trim();
+      const apiKey = document.getElementById('apikey').value.trim();
+
+      if (!ra || !digito || !uf || !senha || !apiKey) {
+        alert('Por favor, preencha todos os campos!');
+        return;
+      }
+
+      sendBtn.disabled = true;
+      responseField.value = "Processando... aguarde.";
+
+      try {
+        const prompt = `Sou o usuário com RA ${ra}-${digito} da UF ${uf}. Minha senha é ${senha}. Por favor, responda e finalize as tarefas da plataforma Sala do Futuro automaticamente para mim.`;
+
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: prompt }]
+          })
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          responseField.value = `Erro: ${res.status} - ${errorData.error.message}`;
+        } else {
+          const data = await res.json();
+          const answer = data.choices[0].message.content;
+          responseField.value = answer;
+        }
+      } catch (e) {
+        responseField.value = 'Erro na requisição: ' + e.message;
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>
